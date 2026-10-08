@@ -8,7 +8,11 @@ import {
   ModelCardData
 } from '../types/api';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+// Uses VITE_API_URL if configured, otherwise falls back to relative /api in production
+// (routed via Vercel services rewrite) and http://localhost:8000 during standalone local dev
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL ??
+  (import.meta.env.DEV ? 'http://localhost:8000' : '/api');
 
 class ApiError extends Error {
   status: number;

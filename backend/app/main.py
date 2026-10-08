@@ -1,7 +1,7 @@
 import os
 from contextlib import asynccontextmanager
 from typing import Optional, Dict, Any
-from fastapi import FastAPI, HTTPException, Query, status
+from fastapi import FastAPI, HTTPException, Query, status, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 
 from .schemas import (
@@ -86,7 +86,9 @@ def check_ready():
             detail="Model or Data Service is not ready."
         )
 
-@app.get("/")
+router = APIRouter()
+
+@router.get("/")
 def root():
     return {
         "app": "MindScroll AI API",
@@ -95,7 +97,7 @@ def root():
         "docs_url": "/docs"
     }
 
-@app.get("/health")
+@router.get("/health")
 def health_check():
     if startup_error:
         return {"status": "unhealthy", "error": startup_error}
@@ -105,7 +107,7 @@ def health_check():
         "dataset_loaded": data_service is not None
     }
 
-@app.get("/options", response_model=DatasetOptionsResponse)
+@router.get("/options", response_model=DatasetOptionsResponse)
 def get_options():
     check_ready()
     try:
@@ -113,7 +115,7 @@ def get_options():
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed fetching dataset options: {str(e)}")
 
-@app.post("/predict", response_model=PredictResponse)
+@router.post("/predict", response_model=PredictResponse)
 def predict(request: PredictRequest):
     check_ready()
     try:
@@ -121,7 +123,7 @@ def predict(request: PredictRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Inference error: {str(e)}")
 
-@app.post("/whatif", response_model=WhatIfResponse)
+@router.post("/whatif", response_model=WhatIfResponse)
 def what_if_simulation(request: WhatIfRequest):
     check_ready()
     try:
@@ -129,7 +131,7 @@ def what_if_simulation(request: WhatIfRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Simulation error: {str(e)}")
 
-@app.get("/insights", response_model=InsightsResponse)
+@router.get("/insights", response_model=InsightsResponse)
 def get_insights(
     gender: Optional[str] = Query(None, description="Gender filter"),
     academic_level: Optional[str] = Query(None, description="Academic level filter"),
@@ -145,7 +147,7 @@ def get_insights(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed compiling dataset insights: {str(e)}")
 
-@app.get("/model-card")
+@router.get("/model-card")
 def get_model_card() -> Dict[str, Any]:
     check_ready()
     if model_service and model_service.evaluation_meta:
@@ -155,3 +157,7 @@ def get_model_card() -> Dict[str, Any]:
         "comparison": [],
         "best_model": "Random Forest Regressor"
     }
+
+# Mount routes at root and with /api prefix for Vercel rewrites and reverse proxies
+app.include_router(router)
+app.include_router(router, prefix="/api")

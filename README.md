@@ -20,6 +20,7 @@
 - [Quickstart Guide](#-quickstart-guide)
   - [Option A: Running with Docker Compose (One-Command)](#option-a-running-with-docker-compose-one-command)
   - [Option B: Running Locally (Development)](#option-b-running-locally-development)
+  - [Option C: Deploying to Vercel (Multi-Service Project)](#option-c-deploying-to-vercel-multi-service-project)
 - [API Documentation](#-api-documentation)
 - [Themes and Animations](#-themes-and-animations)
 - [Performance & Accessibility](#-performance--accessibility)
@@ -202,6 +203,23 @@ npm install
 npm run dev
 ```
 Open `http://localhost:5173` in your browser.
+
+---
+
+### Option C: Deploying to Vercel (Multi-Service Project)
+
+MindScroll AI includes built-in native support for [Vercel Multi-Service Projects](https://vercel.com/docs/services) via the root [`vercel.json`](./vercel.json):
+
+1. **Deploy to Vercel**: Import this GitHub repository into your Vercel Dashboard as a single project.
+2. **Architecture**:
+   - `frontend` service builds the Vite + React client application.
+   - `backend` service runs the FastAPI + Scikit-Learn serverless ML pipeline.
+   - Top-level rewrite routes `/(.*)` to `frontend` and `/api/(.*)` to `backend`.
+   - Internal binding injects `BACKEND_URL` into the frontend service.
+3. **Local Emulation via Vercel CLI**:
+   ```bash
+   vercel dev
+   ```
 
 ---
 

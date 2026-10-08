@@ -4,6 +4,15 @@ All notable changes and upgrades to MindScroll AI are documented in this file.
 
 ---
 
+## [2.1.0] - Vercel Multi-Service Deployment Support
+- **Vercel Project Services Architecture**: Added root `vercel.json` defining `frontend` (Vite) and `backend` (FastAPI) as unified multi-services.
+- **Top-Level Rewrites**: Configured `/(.*)` -> `frontend` and `/api/(.*)` -> `backend`.
+- **Internal Service Bindings**: Added `BACKEND_URL` binding from `frontend` to `backend`.
+- **FastAPI Route Dual-Mounting**: Configured routes at both root `/` and `/api` prefix for seamless reverse-proxying.
+- **Vercel ASGI Entrypoint**: Created `backend/main.py` exporting the ASGI app for automatic framework detection.
+
+---
+
 ## [2.0.0] - Creative Motion & Universal Theme Upgrade
 
 ### 🎨 Part 1: Light / Dark / System Theme Architecture
