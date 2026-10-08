@@ -13,6 +13,7 @@ import { InsightsPage } from './pages/InsightsPage';
 import { ModelCardPage } from './pages/ModelCardPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 
+import { Preloader } from './components/fx/Preloader';
 import { AuroraBackground } from './components/fx/AuroraBackground';
 import { ParticleField } from './components/fx/ParticleField';
 import { NoiseOverlay } from './components/fx/NoiseOverlay';
@@ -29,8 +30,10 @@ import {
 
 function MainApp() {
   useLenis(); // Smooth Lenis scrolling
+  const { toggleTheme } = useTheme();
   const { history, addHistoryItem, clearHistory } = useHistory();
 
+  const [preloaderComplete, setPreloaderComplete] = useState(false);
   const [currentPage, setCurrentPage] = useState<string>('landing');
   const [historyDrawerOpen, setHistoryDrawerOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -45,6 +48,18 @@ function MainApp() {
   const [currentInput, setCurrentInput] = useState<PredictRequest | null>(null);
   const [currentResult, setCurrentResult] = useState<PredictResponse | null>(null);
   const [isPredicting, setIsPredicting] = useState(false);
+
+  // Keyboard shortcut listener: 'T' toggles theme
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      if (e.key === 't' || e.key === 'T') {
+        toggleTheme();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [toggleTheme]);
 
   const addToast = (
     title: string,
@@ -133,13 +148,16 @@ function MainApp() {
         isSidebarCollapsed ? 'md:pl-20' : 'md:pl-20 lg:pl-64'
       } pt-14 md:pt-0 pb-[calc(4.2rem+env(safe-area-inset-bottom))] md:pb-0`}
     >
+      {/* 0-100% Preloader (runs once per session, respects reduced motion) */}
+      <Preloader onComplete={() => setPreloaderComplete(true)} />
+
       {/* Background Visual Effects */}
       <AuroraBackground />
       <ParticleField />
       <NoiseOverlay />
       <CustomCursor />
 
-      {/* Multi-tier Responsive Navigation (Desktop Sidebar, Tablet Icon Bar, Mobile Header + Bottom Tabs) */}
+      {/* Multi-tier Responsive Navigation */}
       <Navbar
         currentPage={currentPage}
         onNavigate={setCurrentPage}
@@ -232,7 +250,7 @@ function MainApp() {
         </AnimatePresence>
       </main>
 
-      <Footer onNavigate={setCurrentPage} />
+      <Footer onNavigate={setCurrentPage} currentPage={currentPage} />
 
       {/* History Drawer */}
       <HistoryDrawer

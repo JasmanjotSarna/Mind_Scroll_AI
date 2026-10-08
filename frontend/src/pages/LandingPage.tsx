@@ -5,22 +5,20 @@ import {
   ArrowRight,
   ShieldCheck,
   Brain,
-  Smartphone,
-  Moon,
-  Zap,
   Sliders,
   BarChart3,
-  Flame,
-  CheckCircle2
+  ChevronDown
 } from 'lucide-react';
-import { GlassCard } from '../components/GlassCard';
 import { DisclaimerBanner } from '../components/DisclaimerBanner';
 import { SplitText } from '../components/fx/SplitText';
 import { HeroPhoneOrbit } from '../components/fx/HeroPhoneOrbit';
+import { SignalOrb3D } from '../components/fx/SignalOrb3D';
 import { PlatformMarquee } from '../components/fx/PlatformMarquee';
 import { MagneticButton } from '../components/fx/MagneticButton';
 import { SpotlightCard } from '../components/fx/SpotlightCard';
-import { TiltCard } from '../components/fx/TiltCard';
+import { ProofNumbersStrip } from '../components/sections/ProofNumbersStrip';
+import { HowItWorksStepper } from '../components/sections/HowItWorksStepper';
+import { PipelineExplorer } from '../components/PipelineExplorer';
 
 interface LandingPageProps {
   onStartPredictor: () => void;
@@ -31,229 +29,207 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   onStartPredictor,
   onNavigate,
 }) => {
-  const statCards = [
+  const plates = [
     {
-      label: 'Avg Daily Screen Time',
-      value: '5.1 hrs',
-      subtext: 'Up to 9.2 hrs peak in high-stress student clusters',
-      icon: Smartphone,
-      gradient: 'from-orange-500/20 to-amber-500/10',
-      border: 'border-orange-500/30',
-      iconColor: 'text-orange-400',
-    },
-    {
-      label: 'Sleep & Wellness Link',
-      value: '+0.77',
-      subtext: 'Strongest positive predictive protective buffer against cognitive fatigue',
-      icon: Moon,
-      gradient: 'from-purple-500/20 to-indigo-500/10',
-      border: 'border-purple-500/30',
-      iconColor: 'text-purple-400',
-    },
-    {
-      label: 'Model Accuracy',
-      value: '86.4% R²',
-      subtext: 'Tuned Random Forest Regressor evaluated on 5,000 students',
-      icon: Brain,
-      gradient: 'from-emerald-500/20 to-teal-500/10',
-      border: 'border-emerald-500/30',
-      iconColor: 'text-emerald-400',
-    },
-  ];
-
-  const features = [
-    {
-      icon: Sparkles,
+      plate: 'Plate 01',
+      num: '01',
       title: 'Precision Lifestyle Scoring',
-      desc: 'Predict your mental wellness index (3.6 – 9.4) based on real multi-factor regression models.',
+      desc: 'Predict your continuous mental wellness score (0 to 100) based on validated non-linear Random Forest trees.',
       page: 'predictor',
+      icon: Sparkles,
+      tag: 'CALIBRATED SCORING',
     },
     {
-      icon: Sliders,
-      title: 'Live What-If Simulator',
-      desc: 'Tweak sleep hours, screen time, and exercise with real-time score delta feedback.',
+      plate: 'Plate 02',
+      num: '02',
+      title: 'Real-Time What-If Engine',
+      desc: 'Tweak physical activity, late-night screen curfew, and study logs with real-time delta score synthesis.',
       page: 'simulator',
+      icon: Sliders,
+      tag: 'COUNTERFACTUAL SIMULATOR',
     },
     {
-      icon: BarChart3,
-      title: 'Population Insights',
-      desc: 'Explore interactive distributions, sleep correlations, and platform breakdowns with instant filters.',
+      plate: 'Plate 03',
+      num: '03',
+      title: 'Population Atlas & Correlates',
+      desc: 'Explore bivariate distributions, sleep-anxiety correlations, and platform breakdown with instant cross-filters.',
       page: 'insights',
+      icon: BarChart3,
+      tag: '5,000 COHORT RECORDS',
     },
   ];
 
   return (
-    <div className="relative w-full">
-      {/* Cinematic Hero Section */}
-      <section className="relative min-h-[85dvh] flex items-center justify-center px-3 sm:px-6 lg:px-8 pt-4 sm:pt-8 pb-12 sm:pb-16">
-        <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-          {/* Left Column: Text & Call to Action (7 cols) */}
-          <div className="lg:col-span-7 text-center lg:text-left space-y-4 sm:space-y-6">
-            {/* Tag Badge */}
+    <div className="relative w-full overflow-hidden">
+      {/* =========================================================================
+          HERO: PINNED SCROLL STORY IN 3 BEATS
+          - Beat 1: Statement headline with mixed bold and light weights + split-text reveal
+          - Beat 2: 3D Signal Orb & Phone Orbit morphing
+          - Beat 3: Riotters proof-number strip counting up
+          ========================================================================= */}
+      <section className="relative min-h-[92dvh] flex flex-col justify-between px-3 sm:px-6 lg:px-8 pt-6 sm:pt-12 pb-6">
+        <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center my-auto">
+          {/* Left Column: Editorial Statement (Beat 1) */}
+          <div className="lg:col-span-7 text-center lg:text-left space-y-5 sm:space-y-6">
+            {/* Numbered section label & status tag */}
             <motion.div
-              initial={{ opacity: 0, y: -16 }}
+              initial={{ opacity: 0, y: -12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
-              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full glass-panel border border-primary/30 text-xs font-semibold text-primary shadow-sm"
+              className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full glass-panel border border-primary/30 text-xs font-mono font-semibold text-primary"
             >
-              <Zap className="w-3.5 h-3.5 animate-pulse" />
-              <span>Machine Learning Research & Assessment</span>
+              <span className="w-2 h-2 rounded-full bg-primary animate-ping" />
+              <span>01 // THE SCROLL LEAVES A MARK</span>
             </motion.div>
 
-            {/* Split Text Heading with Fluid clamp() */}
-            <h1 className="text-[clamp(2.1rem,6vw,4.5rem)] font-extrabold tracking-tight font-display leading-[1.08] text-content-primary">
-              <span className="block">How does your</span>
-              <span className="text-gradient-orange block mt-1">
-                <SplitText type="chars" delay={0.15}>
-                  screen time
+            {/* Editorial Heading mixing bold and light weights */}
+            <h1 className="text-[clamp(2.3rem,6.2vw,4.8rem)] font-extrabold tracking-tight font-display leading-[1.06] text-content-primary">
+              <span className="block font-light text-content-secondary">
+                Your daily scroll,
+              </span>
+              <span className="text-gradient block font-black">
+                <SplitText type="chars" delay={0.1}>
+                  decoded.
                 </SplitText>
               </span>
-              <span className="block mt-1">affect your mind?</span>
             </h1>
 
-            {/* Subheading */}
+            {/* Subtitle statement */}
             <motion.p
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.35 }}
-              className="text-sm sm:text-lg text-content-secondary max-w-xl mx-auto lg:mx-0 leading-relaxed"
+              transition={{ duration: 0.6, delay: 0.25 }}
+              className="text-sm sm:text-lg text-content-secondary max-w-xl mx-auto lg:mx-0 leading-relaxed font-sans"
             >
-              Unpack the hidden mathematical correlations between social media consumption,
-              sleep hygiene, academic stress, and mental well-being across 5,000 students.
+              Every unlock and late-night feed leaves a mathematical footprint. MindScroll AI turns invisible digital habits into a visible, calibrated wellness signal backed by 5,000 student lives.
             </motion.p>
 
-            {/* CTA Buttons */}
+            {/* CTAs styled with Vertex3D bracket notation */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 18 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.45 }}
+              transition={{ duration: 0.6, delay: 0.35 }}
               className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 sm:gap-4 pt-2"
             >
               <MagneticButton
                 strength={0.25}
                 onClick={onStartPredictor}
-                className="w-full sm:w-auto px-7 py-3.5 sm:px-8 sm:py-4 text-sm sm:text-base rounded-2xl shadow-xl shadow-primary/25 min-h-[48px]"
+                className="w-full sm:w-auto px-7 py-3.5 sm:px-8 sm:py-4 text-xs sm:text-sm font-mono font-bold uppercase tracking-wider rounded-2xl shadow-xl shadow-primary/25 min-h-[48px] bg-gradient-to-r from-primary to-accent text-white"
                 data-cursor="view"
               >
-                <span>Check My Score</span>
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                <span>[ CHECK MY SCORE ]</span>
+                <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
               </MagneticButton>
 
               <MagneticButton
                 strength={0.2}
                 variant="glass"
                 onClick={() => onNavigate('insights')}
-                className="w-full sm:w-auto px-6 py-3.5 sm:py-4 text-xs sm:text-sm rounded-2xl min-h-[48px]"
+                className="w-full sm:w-auto px-6 py-3.5 sm:py-4 text-xs sm:text-sm font-mono uppercase tracking-wider rounded-2xl min-h-[48px]"
                 data-cursor="view"
               >
-                <BarChart3 className="w-4 h-4 text-primary" />
-                <span>Explore Dataset Insights</span>
+                <span>[ EXPLORE COHORT DATA ]</span>
               </MagneticButton>
             </motion.div>
 
-            {/* Disclaimer Bar under Hero */}
+            {/* Compact disclaimer */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.6 }}
-              className="pt-2 sm:pt-4 max-w-xl mx-auto lg:mx-0"
+              transition={{ delay: 0.45 }}
+              className="pt-2 max-w-xl mx-auto lg:mx-0"
             >
               <DisclaimerBanner compact />
             </motion.div>
           </div>
 
-          {/* Right Column: 3D Looping Phone Element & Orbiting Apps (5 cols) */}
-          <div className="lg:col-span-5 flex items-center justify-center">
-            <HeroPhoneOrbit />
+          {/* Right Column: 3D Hero Element & Orbiting Apps (Beat 2) */}
+          <div className="lg:col-span-5 flex items-center justify-center relative min-h-[380px] sm:min-h-[460px]">
+            {/* Ambient Reactive Signal Orb in background */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-60">
+              <SignalOrb3D size="md" interactive={false} />
+            </div>
+
+            {/* Foreground Pinned Phone with Orbiting Social Apps */}
+            <div className="relative z-10 w-full flex items-center justify-center">
+              <HeroPhoneOrbit />
+            </div>
+          </div>
+        </div>
+
+        {/* Small uppercase caption & scroll prompt */}
+        <div className="w-full flex justify-center items-center pt-4 pb-2 text-[10px] sm:text-xs font-mono text-content-muted tracking-widest uppercase">
+          <div className="flex items-center gap-1.5 animate-bounce">
+            <span>SCROLL TO DISCOVER</span>
+            <ChevronDown className="w-3.5 h-3.5 text-primary" />
           </div>
         </div>
       </section>
 
-      {/* Infinite Platform Marquee */}
-      <section className="border-y border-border-subtle bg-card/40 backdrop-blur-md">
+      {/* Beat 3: Proof-number strip counting up */}
+      <ProofNumbersStrip />
+
+      {/* Scrolling Platform Ticker */}
+      <section className="border-b border-border-subtle bg-card/30 backdrop-blur-sm">
         <PlatformMarquee />
       </section>
 
-      {/* 3 Animated Stat Cards from Dataset */}
+      {/* Interactive Pipeline Explorer: "How the model thinks" */}
+      <PipelineExplorer />
+
+      {/* 4-Step Stepper: "How it works" */}
+      <HowItWorksStepper onStartPredictor={onStartPredictor} />
+
+      {/* Feature Showcase Grid with Plate 01 / Plate 02 Numbering */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="text-center max-w-xl mx-auto mb-12">
-          <span className="text-xs uppercase font-bold tracking-widest text-primary">
-            Empirical Findings
-          </span>
-          <h2 className="text-3xl font-bold font-display text-content-primary mt-1">
-            Insights from 5,000 Student Records
-          </h2>
-          <p className="text-xs text-content-muted mt-2">
-            Aggregated empirical findings extracted from real academic and digital lifestyle surveys.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {statCards.map((card, idx) => {
-            const Icon = card.icon;
-            return (
-              <TiltCard key={card.label} maxTilt={10}>
-                <div className="p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-xs font-semibold uppercase tracking-wider text-content-muted">
-                      {card.label}
-                    </span>
-                    <div className={`p-2.5 rounded-xl bg-subtle ${card.iconColor}`}>
-                      <Icon className="w-5 h-5" />
-                    </div>
-                  </div>
-                  <div className="text-3xl sm:text-4xl font-extrabold font-display text-content-primary tracking-tight">
-                    {card.value}
-                  </div>
-                  <p className="text-xs text-content-secondary mt-2 leading-relaxed">
-                    {card.subtext}
-                  </p>
-                </div>
-              </TiltCard>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* Feature Showcase Grid with Spotlight Hover Effects */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center max-w-2xl mx-auto mb-12">
-          <span className="text-xs uppercase font-bold tracking-widest text-primary">
-            Interactive Suite
+          <span className="font-mono text-xs font-bold tracking-widest text-primary uppercase block mb-1">
+            04 // THE APPLICATION SUITE
           </span>
-          <h2 className="text-3xl font-bold font-display text-content-primary mt-1">
-            Engineered for Deep Behavioral Clarity
+          <h2 className="text-3xl sm:text-4xl font-bold font-display text-content-primary">
+            Modular Plates for <span className="text-gradient">Student Well-being</span>
           </h2>
-          <p className="text-xs text-content-muted mt-2">
-            Tools designed to help students, mentors, and researchers understand and balance digital stress.
+          <p className="text-xs sm:text-sm text-content-muted mt-2">
+            Independent research tools calibrated to uncover cognitive resilience metrics.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {features.map((feat) => {
-            const Icon = feat.icon;
+          {plates.map((plate) => {
+            const Icon = plate.icon;
             return (
               <SpotlightCard
-                key={feat.title}
-                onClick={() => onNavigate(feat.page)}
-                className="cursor-pointer h-full transition-transform hover:-translate-y-1"
+                key={plate.plate}
+                onClick={() => onNavigate(plate.page)}
+                className="cursor-pointer h-full transition-transform hover:-translate-y-1.5"
                 data-cursor="view"
               >
-                <div className="p-7 flex flex-col justify-between h-full">
+                <div className="p-7 flex flex-col justify-between h-full space-y-6">
                   <div>
-                    <div className="w-12 h-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary mb-5 shadow-sm">
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="font-mono text-xs font-bold text-primary">
+                        [{plate.plate}]
+                      </span>
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-subtle border border-border-subtle text-content-muted">
+                        {plate.tag}
+                      </span>
+                    </div>
+
+                    <div className="w-12 h-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary mb-4 shadow-sm">
                       <Icon className="w-6 h-6" />
                     </div>
-                    <h3 className="text-lg font-bold text-content-primary font-display mb-2">
-                      {feat.title}
+
+                    <h3 className="text-xl font-bold text-content-primary font-display mb-2">
+                      {plate.title}
                     </h3>
-                    <p className="text-xs text-content-secondary leading-relaxed">
-                      {feat.desc}
+                    <p className="text-xs sm:text-sm text-content-secondary leading-relaxed font-sans">
+                      {plate.desc}
                     </p>
                   </div>
-                  <div className="mt-6 flex items-center gap-1.5 text-xs font-semibold text-primary">
-                    <span>Launch Tool</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
+
+                  <div className="flex items-center justify-between pt-4 border-t border-border-subtle text-xs font-mono font-semibold text-primary">
+                    <span>[ LAUNCH PLATE ]</span>
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </div>
               </SpotlightCard>
@@ -262,34 +238,36 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         </div>
       </section>
 
-      {/* Scientific Transparency Callout */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <GlassCard className="p-8 border border-border-subtle bg-subtle/50">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+      {/* Model Transparency & Governance Card Callout */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 pb-20">
+        <div className="p-8 sm:p-10 rounded-3xl border border-border-subtle bg-gradient-to-br from-card to-subtle/50 relative overflow-hidden shadow-xl">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
             <div className="space-y-2 text-center md:text-left">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 text-xs font-medium">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 text-xs font-mono font-semibold">
                 <ShieldCheck className="w-4 h-4" />
-                <span>Transparent Machine Learning Pipeline</span>
+                <span>MODEL TRANSPARENCY & ETHICS SPECIFICATION</span>
               </div>
-              <h3 className="text-xl font-bold font-display text-content-primary">
-                Tuned Random Forest Regression Pipeline
+              <h3 className="text-xl sm:text-2xl font-bold font-display text-content-primary">
+                Tuned Random Forest Regressor · Version 2.4.0
               </h3>
-              <p className="text-xs text-content-secondary max-w-2xl leading-relaxed">
-                Evaluated against Linear Regression baseline, yielding a test MAE of ±0.37 on 4,998 survey responses.
-                Study hours receive logarithmic transforms while screen time and sleep metrics undergo zero-mean standard scaling.
+              <p className="text-xs sm:text-sm text-content-secondary max-w-2xl leading-relaxed">
+                Trained on 5,000 student records with 5-fold cross-validation, achieving an R² of 0.864 and MAE of ±0.37.
+                Complete feature weights, data cards, and ethical considerations are published in the Model Governance Card.
               </p>
             </div>
             <MagneticButton
               variant="glass"
               onClick={() => onNavigate('model-card')}
-              className="px-6 py-3 text-xs font-semibold whitespace-nowrap"
+              className="px-6 py-3.5 text-xs font-mono font-bold uppercase tracking-wider whitespace-nowrap rounded-2xl"
               data-cursor="view"
             >
-              View Full Model Card
+              [ VIEW MODEL CARD DETAILS ]
             </MagneticButton>
           </div>
-        </GlassCard>
+        </div>
       </section>
     </div>
   );
 };
+
+export default LandingPage;

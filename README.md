@@ -301,6 +301,72 @@ Returns complete model comparison benchmarks, training hyper-parameters, and pip
 
 ---
 
+## 🎨 Design System: "The Scroll Leaves a Mark"
+
+MindScroll AI merges the best elements of world-class design systems into one cohesive, award-level experience under the central narrative: **"Your daily scroll adds up. Turn invisible habits into a visible, beautiful signal."**
+
+```
++-----------------------------------------------------------------------------------+
+|                            THE SCROLL LEAVES A MARK                               |
+|                                                                                   |
+|  [ Vertex3D ]          [ Riotters ]           [ DashDigital ]       [ Portfolio ] |
+|  - Preloader (0-100%)  - Bold 2-line hero     - Editorial type      - Plate tags  |
+|  - Bracket navigation  - Proof number strip   - "Menu +" overlay    - Interactive |
+|  - 3D Signal Orb       - 4-step stepper       - Expandable rows       pipeline    |
+|  - Bracket buttons     - Playful micro-copy   - "Next Page" footer    explorer    |
++-----------------------------------------------------------------------------------+
+```
+
+### 1. Unified Design Language
+- **From Vertex3D**:
+  - `Preloader`: 0-100% counter with live SVG signal wave drawing and curtain reveal (runs once per session; respects `prefers-reduced-motion`).
+  - Bracket Navigation: `[ Home ] [ Predict ] [ Simulator ] [ Insights ] [ Model ]`.
+  - Numbered Section Labels: `01 // THE SCROLL LEAVES A MARK`, `02 // HOW THE MODEL THINKS`, `03 // HOW IT WORKS`.
+  - Mixed-weight Headings: `Your scroll, *decoded*`.
+  - 3D Signal Element: `SignalOrb3D` built with Three.js WebGL particle simulation with orbit rings, responding dynamically to user wellness state.
+  - Bracket Buttons: `[ CHECK MY SCORE ]`, `[ RUN INFERENCE ]`, `[ TRY WHAT-IF ]`.
+- **From Riotters**:
+  - Pinned 3-beat hero story with split-text reveal.
+  - Live empirical proof numbers strip counting up (`5,000` students, `12` lifestyle features, `0.864` model R², `10+` global regions).
+  - Numbered 4-step "How it works" stepper with Prev/Next controls.
+  - Signature accent with playful micro-copy (`"Don't worry—we don't judge your 2 AM memes"`).
+- **From DashDigital**:
+  - Large editorial typography with generous whitespace.
+  - Full-screen "Menu +" navigation overlay with item counts and atlas metadata.
+  - Expandable accordion rows (`More +` / `Less -`) for model card hyperparameters and FAQs.
+  - Contextual "Next Page" footer preview block linking sequentially to the next experience.
+  - Smooth "Back to top" floating control.
+- **From the Portfolio Pipeline Explorer**:
+  - `Plate 01`, `Plate 02`, `Plate 03`, `Plate 04` numbering across cards.
+  - Interactive "How the model thinks" pipeline explorer (Student Inputs $\rightarrow$ Preprocessing $\rightarrow$ Random Forest $\rightarrow$ Score Synthesis) with arrow-key navigation, auto-play mode, and live JSON I/O inspection.
+  - Scrolling infinite ticker of platform names (`PlatformMarquee`).
+  - Single-click "Copy Summary" clipboard generator on assessment results.
+- **CardioDetect ML Platform Feel**:
+  - Clear "Educational research platform" tone.
+  - Prominent non-clinical disclaimer banners.
+  - Open model card transparency specification with cross-model metrics.
+
+### 2. Color Tokens & Visual System
+- **Dark Theme (`[data-theme="dark"]`)**:
+  - Base: `#0A0A0A`
+  - Cards: `#121212` with frosted glass backdrop blur
+  - Primary Accent: Gradient from `#FF6B1A` to `#FF8A3D`
+  - Secondary: Cool cyan / teal glow `#38BDF8`
+  - Borders: Hairline `rgba(255, 255, 255, 0.08)`
+  - Film Grain: SVG noise overlay
+- **Light Theme (`[data-theme="light"]`)**:
+  - Base: Warm cream `#FFF8F1`
+  - Cards: Pure white frosted glass `rgba(255, 255, 255, 0.85)`
+  - Ink Typography: `#1A1410`
+  - Primary Accent: Rich peach gradient `#FF6B1A` to `#F97316`
+  - Shadows: Soft diffuse warm drop-shadows
+- **Typography Hierarchy**:
+  - Display: `Space Grotesk` (Google Fonts) with fluid `clamp()` sizing
+  - Body: `Inter`
+  - Telemetry & Labels: `JetBrains Mono`
+
+---
+
 ## 🎨 Themes and Animations
 
 MindScroll AI features an award-winning (Awwwards / Linear / Vercel level) visual and motion architecture designed for delight, usability, and speed:

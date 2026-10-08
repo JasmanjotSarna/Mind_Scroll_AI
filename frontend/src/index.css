@@ -65,6 +65,61 @@
   h1, h2, h3, h4, .font-display {
     font-family: 'Space Grotesk', 'Sora', system-ui, sans-serif;
   }
+
+  code, kbd, samp, pre, .font-mono {
+    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  }
+}
+
+/* Vertex3D / Riotters / DashDigital Signature Tokens */
+.bracket-btn {
+  font-family: 'JetBrains Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all 0.25s ease;
+}
+
+.bracket-btn::before {
+  content: "[";
+  opacity: 0.5;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.bracket-btn::after {
+  content: "]";
+  opacity: 0.5;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.bracket-btn:hover::before {
+  opacity: 1;
+  color: var(--accent-orange);
+  transform: translateX(-2px);
+}
+
+.bracket-btn:hover::after {
+  opacity: 1;
+  color: var(--accent-orange);
+  transform: translateX(2px);
+}
+
+.plate-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.signal-line-pulse {
+  background: linear-gradient(90deg, transparent, var(--accent-orange), transparent);
+  box-shadow: 0 0 12px var(--accent-glow);
 }
 
 /* Glassmorphism Styles */

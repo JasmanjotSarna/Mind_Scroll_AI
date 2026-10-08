@@ -11,13 +11,11 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
-  Shield,
-  Activity,
   ArrowRight
 } from 'lucide-react';
 import { HistoryItem } from '../hooks/useHistory';
 import { ThemeToggle } from './fx/ThemeToggle';
-import { MagneticButton } from './fx/MagneticButton';
+import { MenuOverlay } from './MenuOverlay';
 
 interface NavbarProps {
   currentPage: string;
@@ -39,15 +37,16 @@ export const Navbar: React.FC<NavbarProps> = ({
   onToggleSidebar,
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [menuOverlayOpen, setMenuOverlayOpen] = useState(false);
   const [tabletHovered, setTabletHovered] = useState(false);
 
-  // Navigation Links definition
+  // Navigation Links definition with numbers and bracket labels
   const navItems = [
-    { id: 'landing', label: 'Home', shortLabel: 'Home', icon: Brain, desc: 'Overview & telemetry' },
-    { id: 'predictor', label: 'Predictor', shortLabel: 'Predict', icon: Sparkles, desc: 'Student lifestyle scoring' },
-    { id: 'simulator', label: 'What-If Simulator', shortLabel: 'What-If', icon: Sliders, desc: 'Real-time habit adjustments' },
-    { id: 'insights', label: 'Population Insights', shortLabel: 'Insights', icon: BarChart3, desc: 'Distributions & correlations' },
-    { id: 'model-card', label: 'Model Governance', shortLabel: 'Model', icon: FileCode2, desc: 'Benchmarks & architecture' },
+    { id: 'landing', label: 'Home', bracketLabel: '[ Home ]', num: '01', shortLabel: 'Home', icon: Brain, desc: 'Overview & telemetry' },
+    { id: 'predictor', label: 'Predictor', bracketLabel: '[ Predict ]', num: '02', shortLabel: 'Predict', icon: Sparkles, desc: 'Student lifestyle scoring' },
+    { id: 'simulator', label: 'What-If Simulator', bracketLabel: '[ Simulator ]', num: '03', shortLabel: 'What-If', icon: Sliders, desc: 'Real-time habit adjustments' },
+    { id: 'insights', label: 'Population Insights', bracketLabel: '[ Insights ]', num: '04', shortLabel: 'Insights', icon: BarChart3, desc: 'Distributions & correlations' },
+    { id: 'model-card', label: 'Model Governance', bracketLabel: '[ Model ]', num: '05', shortLabel: 'Model', icon: FileCode2, desc: 'Benchmarks & architecture' },
   ];
 
   const handleNav = (id: string) => {
@@ -55,10 +54,13 @@ export const Navbar: React.FC<NavbarProps> = ({
     setMobileMenuOpen(false);
   };
 
-  // Close mobile drawer when pressing ESC
+  // Keyboard shortcut listener: 'T' toggles theme, 'M' toggles menu overlay
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setMobileMenuOpen(false);
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      if (e.key === 'm' || e.key === 'M') {
+        setMenuOverlayOpen((prev) => !prev);
+      }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
@@ -67,7 +69,66 @@ export const Navbar: React.FC<NavbarProps> = ({
   return (
     <>
       {/* =========================================================================
-          1. DESKTOP & TABLET SIDEBAR (md:flex, hidden on mobile)
+          1. DESKTOP TOP FLOATING BAR (>= 768px)
+          - Bracket Nav "[ Home ] [ Predict ] [ Insights ] [ Model ]"
+          - "Menu +" Fullscreen Drawer Trigger
+          - Theme Toggle & History Counter
+          ========================================================================= */}
+      <div className="hidden md:flex fixed top-4 right-6 z-40 items-center gap-2.5 backdrop-blur-2xl bg-card/85 border border-border-subtle px-3 py-1.5 rounded-2xl shadow-xl transition-all">
+        {/* Bracket Navigation Links */}
+        <div className="flex items-center gap-1 font-mono text-xs">
+          {navItems.map((item) => {
+            const isActive = currentPage === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => handleNav(item.id)}
+                className={`px-2.5 py-1.5 rounded-lg transition-all tracking-wide ${
+                  isActive
+                    ? 'text-primary font-bold bg-primary/10 border border-primary/25 shadow-sm'
+                    : 'text-content-muted hover:text-content-primary hover:bg-card-hover'
+                }`}
+                title={item.label}
+              >
+                {item.bracketLabel}
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="h-4 w-px bg-border-subtle" />
+
+        {/* DashDigital "Menu +" Button */}
+        <button
+          onClick={() => setMenuOverlayOpen(true)}
+          className="flex items-center gap-1 px-3 py-1.5 rounded-xl font-mono text-xs font-bold text-content-primary hover:text-primary hover:bg-card-hover transition-colors border border-border-subtle"
+          title="Open Fullscreen Atlas"
+        >
+          <span>Menu +</span>
+          <span className="text-[10px] text-primary">({navItems.length})</span>
+        </button>
+
+        {/* History Quick Trigger */}
+        <button
+          onClick={onOpenHistory}
+          className="relative p-2 rounded-xl text-content-muted hover:text-content-primary hover:bg-card-hover transition-colors"
+          title="Past Predictions"
+          aria-label="View prediction history"
+        >
+          <History className="w-4 h-4" />
+          {history.length > 0 && (
+            <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-primary text-white text-[9px] font-bold flex items-center justify-center">
+              {history.length}
+            </span>
+          )}
+        </button>
+
+        {/* Theme Toggle */}
+        <ThemeToggle />
+      </div>
+
+      {/* =========================================================================
+          2. DESKTOP & TABLET SIDEBAR (md:flex, hidden on mobile)
           - Tablet (768px-1023px): Collapsed icon-only (w-20), expands on hover/tap
           - Desktop (1024px+): User toggleable (w-20 collapsed / w-64 expanded)
           ========================================================================= */}
@@ -87,9 +148,9 @@ export const Navbar: React.FC<NavbarProps> = ({
             className="flex items-center gap-3 text-left focus:outline-none group min-h-[44px]"
             title="MindScroll AI Home"
           >
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary-hover p-0.5 shadow-md shadow-primary/20 group-hover:scale-105 transition-transform flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent p-0.5 shadow-md shadow-primary/20 group-hover:scale-105 transition-transform flex items-center justify-center shrink-0">
               <div className="w-full h-full bg-base rounded-[10px] flex items-center justify-center">
-                <Brain className="w-5 h-5 text-primary group-hover:text-primary-hover transition-colors" />
+                <Brain className="w-5 h-5 text-primary group-hover:text-accent transition-colors" />
               </div>
             </div>
 
@@ -108,7 +169,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     AI
                   </span>
                 </div>
-                <p className="text-[10px] text-content-muted">Wellness Predictor</p>
+                <p className="text-[10px] text-content-muted font-mono">01 // SIGNAL CORE</p>
               </motion.div>
             )}
           </button>
@@ -141,7 +202,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 key={item.id}
                 onClick={() => handleNav(item.id)}
-                className={`relative w-full flex items-center gap-3.5 px-3 py-3 rounded-xl text-xs font-semibold transition-all min-h-[44px] group ${
+                className={`relative w-full flex items-center gap-3 px-3 py-3 rounded-xl text-xs font-semibold transition-all min-h-[44px] group ${
                   isActive
                     ? 'text-white'
                     : 'text-content-secondary hover:text-content-primary hover:bg-card-hover'
@@ -153,7 +214,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 {isActive && (
                   <motion.div
                     layoutId="sidebar-active-tab"
-                    className="absolute inset-0 rounded-xl bg-gradient-to-r from-primary to-primary-hover shadow-md shadow-primary/25 z-0"
+                    className="absolute inset-0 rounded-xl bg-gradient-to-r from-primary to-accent shadow-md shadow-primary/25 z-0"
                     transition={{ type: 'spring', stiffness: 450, damping: 30 }}
                   />
                 )}
@@ -167,9 +228,14 @@ export const Navbar: React.FC<NavbarProps> = ({
                     initial={{ opacity: 0, x: -4 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.15 }}
-                    className="relative z-10 text-left overflow-hidden whitespace-nowrap"
+                    className="relative z-10 text-left overflow-hidden whitespace-nowrap flex-1"
                   >
-                    <span className="block truncate">{item.label}</span>
+                    <div className="flex items-center justify-between">
+                      <span className="block truncate font-medium">{item.label}</span>
+                      <span className={`text-[10px] font-mono ${isActive ? 'text-white/80' : 'text-primary/70'}`}>
+                        {item.num}
+                      </span>
+                    </div>
                     <span className={`block text-[10px] font-normal truncate ${isActive ? 'text-white/80' : 'text-content-muted'}`}>
                       {item.desc}
                     </span>
@@ -182,54 +248,37 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         {/* Sidebar Footer Controls */}
         <div className="p-3 border-t border-border-subtle space-y-2 bg-subtle/30">
-          {/* Quick CTA button when expanded */}
           {(!isSidebarCollapsed || tabletHovered) && (
             <button
               onClick={() => handleNav('predictor')}
-              className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold bg-gradient-to-r from-primary to-primary-hover text-white shadow-md shadow-primary/20 hover:opacity-95 transition-opacity min-h-[44px]"
+              className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold bg-gradient-to-r from-primary to-accent text-white shadow-md shadow-primary/20 hover:opacity-95 transition-opacity min-h-[44px] font-mono"
             >
               <div className="flex items-center gap-2">
                 <Sparkles className="w-4 h-4" />
-                <span>Check Score</span>
+                <span>[ CHECK MY SCORE ]</span>
               </div>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           )}
 
-          {/* Controls Bar: Theme Toggle, History, Status */}
+          {/* Connection Status */}
           <div className={`flex items-center ${(!isSidebarCollapsed || tabletHovered) ? 'justify-between' : 'flex-col gap-3'} pt-1`}>
-            {/* Showpiece Theme Toggle */}
-            <ThemeToggle />
-
-            {/* History Button */}
-            <button
-              onClick={onOpenHistory}
-              className="relative p-2.5 rounded-xl text-content-secondary hover:text-content-primary hover:bg-card-hover border border-transparent hover:border-border-subtle transition-all min-h-[44px] min-w-[44px] flex items-center justify-center"
-              title="Prediction History"
-              aria-label="View prediction history"
-            >
-              <History className="w-4 h-4" />
-              {history.length > 0 && (
-                <span className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-primary text-white text-[9px] font-bold flex items-center justify-center">
-                  {history.length}
-                </span>
-              )}
-            </button>
-
-            {/* Status Dot */}
             {(!isSidebarCollapsed || tabletHovered) && (
               <div
                 title={backendOnline ? 'FastAPI model backend online' : 'FastAPI model backend connecting...'}
-                className="flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-mono bg-subtle border border-border-subtle"
+                className="flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-mono bg-subtle border border-border-subtle w-full justify-between"
               >
-                <span
-                  className={`w-2 h-2 rounded-full ${
-                    backendOnline ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'
-                  }`}
-                />
-                <span className="text-content-muted">
-                  {backendOnline ? 'Online' : 'Connecting'}
-                </span>
+                <div className="flex items-center gap-1.5">
+                  <span
+                    className={`w-2 h-2 rounded-full ${
+                      backendOnline ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'
+                    }`}
+                  />
+                  <span className="text-content-muted">
+                    {backendOnline ? 'CORE ONLINE' : 'STANDBY'}
+                  </span>
+                </div>
+                <span className="text-[9px] text-content-muted font-mono">PORT 8000</span>
               </div>
             )}
           </div>
@@ -237,17 +286,14 @@ export const Navbar: React.FC<NavbarProps> = ({
       </aside>
 
       {/* =========================================================================
-          2. MOBILE TOP HEADER (< 768px, hidden on md+)
-          - Height: 56px (h-14)
-          - Logo, History trigger, Theme Toggle (reachable in 1 tap), Hamburger menu
+          3. MOBILE TOP HEADER (< 768px, hidden on md+)
           ========================================================================= */}
       <header className="md:hidden fixed top-0 left-0 right-0 z-40 h-14 backdrop-blur-xl bg-card/85 border-b border-border-subtle px-3 sm:px-4 flex items-center justify-between transition-colors">
-        {/* Brand */}
         <button
           onClick={() => handleNav('landing')}
           className="flex items-center gap-2 group text-left focus:outline-none min-h-[44px]"
         >
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-primary-hover p-0.5 shadow-sm shadow-primary/20 flex items-center justify-center">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-accent p-0.5 shadow-sm shadow-primary/20 flex items-center justify-center">
             <div className="w-full h-full bg-base rounded-[6px] flex items-center justify-center">
               <Brain className="w-4 h-4 text-primary" />
             </div>
@@ -255,14 +301,13 @@ export const Navbar: React.FC<NavbarProps> = ({
           <span className="font-display font-bold text-base tracking-tight text-content-primary">
             Mind<span className="text-primary">Scroll</span>
           </span>
-          <span className="text-[9px] font-bold px-1 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">
+          <span className="text-[9px] font-bold px-1 py-0.5 rounded bg-primary/10 text-primary border border-primary/20 font-mono">
             AI
           </span>
         </button>
 
-        {/* Right Action Icons: Status Dot, History, Theme Toggle, Hamburger */}
         <div className="flex items-center gap-1">
-          {/* Status Indicator Dot */}
+          {/* Status Dot */}
           <div
             title={backendOnline ? 'Model server online' : 'Connecting...'}
             className="w-7 h-7 flex items-center justify-center"
@@ -288,105 +333,22 @@ export const Navbar: React.FC<NavbarProps> = ({
             )}
           </button>
 
-          {/* 1-Tap Showpiece Theme Toggle */}
+          {/* Theme Toggle */}
           <ThemeToggle />
 
-          {/* Hamburger Menu Toggle Button */}
+          {/* Hamburger / Menu Overlay Trigger */}
           <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            onClick={() => setMenuOverlayOpen(true)}
             className="p-2.5 rounded-xl text-content-secondary hover:text-content-primary min-h-[44px] min-w-[44px] flex items-center justify-center focus:outline-none"
-            aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
-            aria-expanded={mobileMenuOpen}
+            aria-label="Open fullscreen navigation menu"
           >
-            {mobileMenuOpen ? <X className="w-5 h-5 text-primary" /> : <Menu className="w-5 h-5" />}
+            <Menu className="w-5 h-5 text-primary" />
           </button>
         </div>
       </header>
 
       {/* =========================================================================
-          3. MOBILE HAMBURGER SLIDE-OVER DRAWER
-          ========================================================================= */}
-      <AnimatePresence>
-        {mobileMenuOpen && (
-          <>
-            {/* Backdrop Overlay */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setMobileMenuOpen(false)}
-              className="md:hidden fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
-            />
-
-            {/* Slide-Down Menu Content */}
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-              className="md:hidden fixed top-14 left-0 right-0 z-50 bg-base/95 backdrop-blur-2xl border-b border-border-subtle p-4 shadow-2xl max-h-[calc(100dvh-3.5rem)] overflow-y-auto"
-            >
-              <div className="space-y-2 mb-4">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-content-muted px-2">
-                  Navigate Pages
-                </span>
-                {navItems.map((item) => {
-                  const Icon = item.icon;
-                  const isActive = currentPage === item.id;
-                  return (
-                    <button
-                      key={item.id}
-                      onClick={() => handleNav(item.id)}
-                      className={`w-full flex items-center justify-between p-3 rounded-xl text-sm font-semibold transition-all min-h-[44px] ${
-                        isActive
-                          ? 'bg-primary text-white shadow-md shadow-primary/25'
-                          : 'text-content-secondary hover:bg-card-hover hover:text-content-primary'
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <Icon className="w-5 h-5" />
-                        <div className="text-left">
-                          <div>{item.label}</div>
-                          <div className={`text-[11px] font-normal ${isActive ? 'text-white/80' : 'text-content-muted'}`}>
-                            {item.desc}
-                          </div>
-                        </div>
-                      </div>
-                      <ChevronRight className="w-4 h-4 opacity-70" />
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Extra Tools in Mobile Drawer */}
-              <div className="pt-3 border-t border-border-subtle space-y-2">
-                <button
-                  onClick={() => {
-                    handleNav('predictor');
-                    setMobileMenuOpen(false);
-                  }}
-                  className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold bg-gradient-to-r from-primary to-primary-hover text-white text-sm shadow-lg shadow-primary/25 min-h-[44px]"
-                >
-                  <Sparkles className="w-4 h-4" />
-                  <span>Start Mental Health Assessment</span>
-                </button>
-
-                <div className="p-3 rounded-xl bg-subtle/70 border border-border-subtle flex items-center justify-between text-xs text-content-secondary">
-                  <span>Backend Server Status</span>
-                  <span className={`font-mono font-semibold ${backendOnline ? 'text-emerald-500' : 'text-amber-500'}`}>
-                    {backendOnline ? '● Online (Port 8000)' : '● Connecting...'}
-                  </span>
-                </div>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
-
-      {/* =========================================================================
           4. MOBILE BOTTOM TAB BAR (< 768px, fixed at bottom)
-          - 5 primary tabs with animated active pill and touch targets >= 44x44px
-          - Safe-area inset padding at bottom for notched devices
           ========================================================================= */}
       <nav
         aria-label="Mobile Navigation"
@@ -407,11 +369,10 @@ export const Navbar: React.FC<NavbarProps> = ({
                 aria-label={item.label}
                 aria-current={isActive ? 'page' : undefined}
               >
-                {/* Floating Active Pill Accent */}
                 {isActive && (
                   <motion.div
                     layoutId="mobile-active-tab-glow"
-                    className="absolute -top-[1px] w-8 h-[3px] rounded-full bg-gradient-to-r from-primary to-primary-hover shadow-sm shadow-primary"
+                    className="absolute -top-[1px] w-8 h-[3px] rounded-full bg-gradient-to-r from-primary to-accent shadow-sm shadow-primary"
                     transition={{ type: 'spring', stiffness: 500, damping: 35 }}
                   />
                 )}
@@ -425,6 +386,15 @@ export const Navbar: React.FC<NavbarProps> = ({
           })}
         </div>
       </nav>
+
+      {/* Full-screen DashDigital Menu Overlay */}
+      <MenuOverlay
+        isOpen={menuOverlayOpen}
+        onClose={() => setMenuOverlayOpen(false)}
+        currentPage={currentPage}
+        onNavigate={handleNav}
+        backendOnline={backendOnline}
+      />
     </>
   );
 };

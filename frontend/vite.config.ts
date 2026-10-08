@@ -19,4 +19,16 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    chunkSizeWarningLimit: 800,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-three': ['three'],
+          'vendor-charts': ['recharts'],
+          'vendor-motion': ['framer-motion'],
+        },
+      },
+    },
+  },
 });

@@ -37,6 +37,7 @@ export default {
       fontFamily: {
         display: ['"Space Grotesk"', 'Sora', 'system-ui', 'sans-serif'],
         sans: ['Inter', 'system-ui', 'sans-serif'],
+        mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-out forwards',

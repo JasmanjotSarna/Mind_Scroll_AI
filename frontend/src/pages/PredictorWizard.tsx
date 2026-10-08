@@ -21,6 +21,7 @@ import { GlassCard } from '../components/GlassCard';
 import { PredictorSkeleton } from '../components/SkeletonLoader';
 import { DisclaimerBanner } from '../components/DisclaimerBanner';
 import { MagneticButton } from '../components/fx/MagneticButton';
+import { SignalOrb3D } from '../components/fx/SignalOrb3D';
 
 interface PredictorWizardProps {
   options: DatasetOptionsResponse | null;
@@ -200,23 +201,52 @@ export const PredictorWizard: React.FC<PredictorWizardProps> = ({
     );
   }
 
+  const estimatedScore = Math.max(
+    20,
+    Math.min(
+      95,
+      65 -
+        (formData.Avg_Daily_Usage_Hours - 4) * 3 +
+        (formData.Sleep_Hours_Per_Night - 6) * 4 -
+        (formData.Stress_Level === 'Very High'
+          ? 18
+          : formData.Stress_Level === 'High'
+          ? 10
+          : formData.Stress_Level === 'Medium'
+          ? 0
+          : -8) +
+        (formData.Physical_Activity_Hours - 1) * 3
+    )
+  );
+
   return (
-    <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10">
-      {/* Title */}
-      <div className="text-center mb-8">
-        <span className="text-xs font-semibold uppercase tracking-widest text-primary">
-          Step-by-Step Assessment
-        </span>
-        <h1 className="text-3xl sm:text-4xl font-extrabold font-display text-content-primary mt-1">
-          Student Lifestyle & Media Predictor
-        </h1>
-        <p className="text-xs text-content-secondary mt-2 max-w-md mx-auto">
-          Complete the four sections below to calculate your mental health index using our validated machine learning pipeline.
-        </p>
+    <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10 relative">
+      {/* Background Signal Orb reacting to inputs */}
+      <div className="fixed inset-0 flex items-center justify-center pointer-events-none opacity-25 z-0 overflow-hidden">
+        <SignalOrb3D score={estimatedScore} stressLevel={formData.Stress_Level as any} size="lg" interactive={false} />
       </div>
 
-      {/* Progress Bar & Steps Tabs */}
-      <div className="mb-6 sm:mb-8">
+      <div className="relative z-10">
+        {/* Title & Large Step Counter */}
+        <div className="text-center mb-8">
+          <div className="flex items-center justify-center gap-3 mb-2">
+            <span className="font-mono text-xs font-bold uppercase tracking-widest text-primary">
+              [ STEP 0{currentStep} / 04 ]
+            </span>
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-primary/10 text-primary border border-primary/25">
+              SIGNAL TRACKER
+            </span>
+          </div>
+          <h1 className="text-3xl sm:text-4xl font-extrabold font-display text-content-primary">
+            Student Lifestyle <span className="text-gradient">Predictor</span>
+          </h1>
+          <p className="text-xs sm:text-sm text-content-secondary mt-1.5 max-w-md mx-auto">
+            Complete the four sections below to calibrate your mental health signal.
+          </p>
+        </div>
+
+        {/* Progress Bar & Steps Tabs */}
+        <div className="mb-6 sm:mb-8">
         {/* Mobile Compact Step Header (< sm) */}
         <div className="sm:hidden flex items-center justify-between p-3 rounded-xl glass-panel border border-border-subtle mb-3">
           <div className="flex items-center gap-2">
@@ -737,10 +767,10 @@ export const PredictorWizard: React.FC<PredictorWizardProps> = ({
                 variant="glass"
                 strength={0.2}
                 onClick={prevStep}
-                className="px-5 py-3 text-xs min-h-[48px] flex items-center gap-2"
+                className="px-5 py-3 text-xs font-mono font-semibold min-h-[48px] flex items-center gap-2"
               >
                 <ArrowLeft className="w-4 h-4" />
-                <span>Previous</span>
+                <span>[ PREV STEP ]</span>
               </MagneticButton>
             ) : (
               <div />
@@ -751,9 +781,9 @@ export const PredictorWizard: React.FC<PredictorWizardProps> = ({
                 type="button"
                 strength={0.25}
                 onClick={nextStep}
-                className="px-6 py-3 text-xs font-semibold min-h-[48px] flex items-center gap-2"
+                className="px-6 py-3 text-xs font-mono font-semibold min-h-[48px] flex items-center gap-2 bg-gradient-to-r from-primary to-accent text-white"
               >
-                <span>Continue</span>
+                <span>[ NEXT STEP ]</span>
                 <ArrowRight className="w-4 h-4" />
               </MagneticButton>
             ) : (
@@ -761,15 +791,16 @@ export const PredictorWizard: React.FC<PredictorWizardProps> = ({
                 type="submit"
                 strength={0.3}
                 disabled={isPredicting}
-                className="px-5 sm:px-8 py-3.5 text-xs sm:text-sm font-bold shadow-xl shadow-primary/30 min-h-[48px] flex items-center justify-center gap-2"
+                className="px-5 sm:px-8 py-3.5 text-xs sm:text-sm font-mono font-bold shadow-xl shadow-primary/30 min-h-[48px] flex items-center justify-center gap-2 bg-gradient-to-r from-primary to-accent text-white"
               >
                 <Sparkles className="w-4 h-4" />
-                <span>Predict Mental Health Score</span>
+                <span>[ RUN INFERENCE ]</span>
               </MagneticButton>
             )}
           </div>
         </form>
       </GlassCard>
+      </div>
     </div>
   );
 };
