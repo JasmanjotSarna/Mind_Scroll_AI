@@ -27,6 +27,10 @@
     --chart-grey: #71717A;
     --chart-grid: var(--line);
 
+    /* Layout dimensions */
+    --nav-h: 80px;
+    --tab-bar-h: 56px;
+
     color-scheme: dark;
   }
 
@@ -41,11 +45,11 @@
     --accent-fg: #FFFFFF;
     --accent-soft: rgba(217, 74, 0, 0.10);
 
-    /* Status colours (score bands) tuned with AA contrast */
+    /* Status colours with verified AA/AAA contrast on cream */
     --status-good: #15803D;
     --status-good-soft: rgba(21, 128, 61, 0.12);
-    --status-moderate: #B45309;
-    --status-moderate-soft: rgba(180, 83, 9, 0.12);
+    --status-moderate: #92400E;
+    --status-moderate-soft: rgba(146, 64, 14, 0.12);
     --status-attention: #C2410C;
     --status-attention-soft: rgba(194, 65, 12, 0.12);
     --status-concern: #B91C1C;
@@ -56,6 +60,10 @@
     --chart-teal: #0D9488;
     --chart-grey: #9CA3AF;
     --chart-grid: var(--line);
+
+    /* Layout dimensions */
+    --nav-h: 80px;
+    --tab-bar-h: 56px;
 
     color-scheme: light;
   }

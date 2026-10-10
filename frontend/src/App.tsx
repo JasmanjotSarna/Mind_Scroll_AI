@@ -239,7 +239,7 @@ function MainApp() {
       />
 
       {/* Main Routed Page Content */}
-      <main className="flex-1 w-full max-w-[1200px] mx-auto relative z-10 px-4 sm:px-6">
+      <main className="flex-1 w-full max-w-[1200px] mx-auto relative z-10 px-4 sm:px-6 pt-[var(--nav-h)] pb-[calc(var(--tab-bar-h)+env(safe-area-inset-bottom)+1.5rem)] md:pb-12">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentPage}

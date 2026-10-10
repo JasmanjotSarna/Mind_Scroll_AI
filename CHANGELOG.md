@@ -2,6 +2,25 @@
 
 All notable changes and upgrades to MindScroll AI are documented in this file.
 
+## [3.1.0] - UI Bug Fixes (Navbar Overlap, Section Stacking, Result Screen Clean-Up)
+
+### 🛠️ 1. Navbar Overlap Fix
+- **CSS Variable `--nav-h`**: Added `--nav-h: 80px` on `:root` and assigned `padding-top: var(--nav-h)` to `<main>` across all pages so content never starts under the navbar.
+- **Scroll Alignment**: Added `scroll-padding-top: var(--nav-h)` to `<html>` and `scroll-margin-top: var(--nav-h)` to sections and anchor targets.
+- **Navbar Opacity & Z-Index**: Set `<header>` to `fixed top-0 left-0 right-0 z-50` with solid surface background at 90% opacity plus `backdrop-blur-md` so content cleanly scrolls underneath without text bleeding through.
+- **Mobile Bottom Tab Bar Padding**: Added `pb-[calc(var(--tab-bar-h)+env(safe-area-inset-bottom)+1.5rem)]` on mobile so bottom cards/buttons are never occluded by the tab bar.
+
+### 🛠️ 2. Section Stacking & Overflow Fix
+- **Sticky Breakdown Prevention**: Replaced `overflow-x: hidden` with `overflow-x: clip` on `html` and `body` in `src/index.css`.
+- **Section Audit**: All sections on the Home page (`LandingPage.tsx`) audited and confirmed as `position: relative`, eliminating negative margins and unpinned stacking conflicts.
+
+### 🛠️ 3. Result Screen Clean-Up & AA Contrast
+- **Zero Orbit Rings / Dots / Mesh**: Removed all 3D orbs, mesh spheres, and scatter dot elements from the Result screen. Exactly one accent color (orange) allowed.
+- **Proportional Gauge Arc**: Arc strictly scales between min (`3.6`) and max (`9.4`) cohort bounds.
+- **High-Contrast Score Digits**: Score number uses `text-fg` (`var(--fg)`) for maximum readability, restricting status band colors strictly to the sweeping arc and the badge.
+- **Verified AA Contrast**: Darkened light mode amber `--status-moderate` to `#92400E` for verified > 6.6:1 contrast against `#FAF7F2` cream background.
+- **Clean Single Scale Line**: Replaced separate "Min / Scale / Max" labels with a unified single line: `"Scale: 3.6 (minimum) – 9.4 (maximum)"`.
+
 ---
 
 ## [3.0.0] - Visual Layer Rebuild From Scratch & Universal Theme System

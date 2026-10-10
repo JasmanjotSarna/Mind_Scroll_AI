@@ -1,9 +1,6 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import {
-  Sparkles,
   ArrowRight,
-  Shield,
   Activity,
   Compass,
   Zap,
@@ -25,9 +22,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   onNavigate,
 }) => {
   return (
-    <div className="w-full space-y-16 py-8 sm:py-12">
-      {/* 01 / STATEMENT HERO */}
-      <section className="max-w-[1200px] mx-auto px-4 sm:px-6">
+    <div className="w-full space-y-16 py-6 sm:py-10">
+      {/* 01 / STATEMENT HERO - position relative, no negative margins */}
+      <section className="relative w-full max-w-[1200px] mx-auto px-4 sm:px-6">
         <div className="max-w-3xl space-y-6">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent-soft border border-accent/20 text-accent font-mono text-xs font-semibold uppercase tracking-wider">
             <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
@@ -119,17 +116,23 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         </div>
       </section>
 
-      {/* PROOF NUMBERS STRIP */}
-      <ProofNumbersStrip totalRecords={5000} r2Score={0.864} />
+      {/* 02 / PROOF NUMBERS STRIP */}
+      <section className="relative w-full">
+        <ProofNumbersStrip totalRecords={5000} r2Score={0.864} />
+      </section>
 
-      {/* PLATFORM TICKER */}
-      <PlatformTicker />
+      {/* 03 / PLATFORM TICKER */}
+      <section className="relative w-full">
+        <PlatformTicker />
+      </section>
 
-      {/* HOW IT WORKS STEPPER */}
-      <HowItWorksStepper onStartPredictor={onStartPredictor} />
+      {/* 04 / HOW IT WORKS STEPPER */}
+      <section className="relative w-full">
+        <HowItWorksStepper onStartPredictor={onStartPredictor} />
+      </section>
 
-      {/* FINAL CTA SECTION */}
-      <section className="max-w-[1200px] mx-auto px-4 sm:px-6 py-12">
+      {/* 05 / FINAL CTA SECTION */}
+      <section className="relative w-full max-w-[1200px] mx-auto px-4 sm:px-6 py-12">
         <div className="relative overflow-hidden rounded-3xl bg-surface border border-line p-8 sm:p-14 text-center">
           {/* Subtle accent glow */}
           <div

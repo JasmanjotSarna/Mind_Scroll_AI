@@ -20,10 +20,10 @@ export const ScoreGauge: React.FC<ScoreGaugeProps> = ({
 }) => {
   const band = getBandDetails(score);
 
-  // Normalize score to 0..1 based on CSV range
+  // Normalize score strictly to 0..1 based on calibrated cohort range (3.6 to 9.4)
   const normalized = Math.max(0, Math.min(1, (score - minScore) / (maxScore - minScore)));
 
-  // SVG Gauge geometry (half circle)
+  // SVG Gauge geometry (half circle arc)
   const radius = size * 0.4;
   const strokeWidth = size * 0.07;
   const cx = size / 2;
@@ -89,7 +89,7 @@ export const ScoreGauge: React.FC<ScoreGaugeProps> = ({
             strokeWidth="2"
           />
 
-          {/* Clean Animated Sweeping Arc reading status color CSS variable */}
+          {/* Proportional Arc - band colour ONLY on the arc */}
           <motion.path
             d={`M ${cx - radius} ${cy} A ${radius} ${radius} 0 0 1 ${cx + radius} ${cy}`}
             fill="none"
@@ -113,30 +113,25 @@ export const ScoreGauge: React.FC<ScoreGaugeProps> = ({
           />
         </svg>
 
-        {/* Central Score Digits */}
+        {/* Central Score Digits - HIGH CONTRAST (var(--fg)), NOT band color */}
         <div className="absolute inset-0 flex flex-col items-center justify-end pb-1 pointer-events-none">
-          <motion.div
-            className="text-4xl sm:text-5xl font-bold tracking-tight font-display transition-colors duration-300"
-            style={{ color: band.color }}
-          >
+          <motion.div className="text-4xl sm:text-5xl font-bold tracking-tight font-display text-fg">
             <motion.span>{displayScore}</motion.span>
           </motion.div>
           <span className="text-[11px] uppercase tracking-wider text-muted font-mono mt-1">
-            Predicted Wellness Score
+            Predicted Score
           </span>
         </div>
       </div>
 
-      {/* Min & Max Labels */}
-      <div className="w-full flex justify-between px-6 text-xs text-muted font-mono mt-2" style={{ maxWidth: size }}>
-        <span>Min: {minScore}</span>
-        <span className="opacity-75">Scale (3.6 – 9.4)</span>
-        <span>Max: {maxScore}</span>
+      {/* Single clean line under the gauge replacing Min / Scale / Max */}
+      <div className="text-xs text-muted font-mono mt-3 text-center">
+        Scale: {minScore} (minimum) – {maxScore} (maximum)
       </div>
 
-      {/* Band Badge */}
+      {/* Band Badge - band colour only on the arc and the badge */}
       {showDetails && (
-        <div className="mt-4">
+        <div className="mt-3.5">
           <Badge variant={badgeVariant} size="md">
             <span
               className="w-2 h-2 rounded-full inline-block mr-1"

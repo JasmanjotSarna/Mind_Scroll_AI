@@ -36,8 +36,8 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   return (
     <>
-      {/* Top Navbar for Desktop & Tablet */}
-      <header className="sticky top-0 z-40 w-full border-b border-line bg-surface/90 backdrop-blur-md transition-colors">
+      {/* Top Navbar with z-index 50 and solid-enough surface background (90% + backdrop blur) */}
+      <header className="fixed top-0 left-0 right-0 z-50 w-full border-b border-line bg-surface/90 backdrop-blur-md transition-colors">
         <div className="max-w-[1200px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           {/* Brand Logo */}
           <button
@@ -121,9 +121,9 @@ export const Navbar: React.FC<NavbarProps> = ({
       {/* Mobile Bottom Tab Bar */}
       <nav
         aria-label="Mobile Navigation"
-        className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-surface/95 backdrop-blur-md border-t border-line pb-[env(safe-area-inset-bottom)] transition-colors"
+        className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-surface/95 backdrop-blur-md border-t border-line pb-[env(safe-area-inset-bottom)] transition-colors h-14"
       >
-        <div className="flex items-center justify-around h-14 px-2">
+        <div className="flex items-center justify-around h-full px-2">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = currentPage === item.id;
