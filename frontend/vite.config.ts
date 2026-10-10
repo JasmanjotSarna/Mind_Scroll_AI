@@ -24,7 +24,6 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          'vendor-three': ['three'],
           'vendor-charts': ['recharts'],
           'vendor-motion': ['framer-motion'],
         },

@@ -13,6 +13,11 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const getSystemTheme = (): ResolvedTheme => {
+    if (typeof window === 'undefined') return 'dark';
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  };
+
   const [mode, setModeState] = useState<ThemeMode>(() => {
     try {
       const saved = localStorage.getItem('mindscroll-theme');
@@ -23,41 +28,34 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return 'system';
   });
 
-  const getSystemTheme = (): ResolvedTheme => {
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-  };
-
   const [resolvedTheme, setResolvedTheme] = useState<ResolvedTheme>(() => {
-    if (mode === 'system') return getSystemTheme();
-    return mode;
+    if (typeof document !== 'undefined') {
+      const current = document.documentElement.getAttribute('data-theme');
+      if (current === 'light' || current === 'dark') return current;
+    }
+    return mode === 'system' ? getSystemTheme() : (mode as ResolvedTheme);
   });
 
-  const applyThemeToDOM = useCallback((resolved: ResolvedTheme) => {
+  const applyThemeToDOM = useCallback((theme: ResolvedTheme) => {
     const root = document.documentElement;
-    root.setAttribute('data-theme', resolved);
-    if (resolved === 'dark') {
-      root.classList.add('dark');
-      root.classList.remove('light');
-    } else {
-      root.classList.add('light');
-      root.classList.remove('dark');
-    }
+    root.setAttribute('data-theme', theme);
+    root.style.colorScheme = theme;
   }, []);
 
-  // Update resolved theme when mode changes or system preference changes
+  // Update resolved theme when mode changes or OS theme preference changes
   useEffect(() => {
-    const updateResolved = () => {
+    const update = () => {
       const resolved = mode === 'system' ? getSystemTheme() : mode;
       setResolvedTheme(resolved);
       applyThemeToDOM(resolved);
     };
 
-    updateResolved();
+    update();
 
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     const handleSystemChange = () => {
       if (mode === 'system') {
-        updateResolved();
+        update();
       }
     };
 
@@ -70,24 +68,30 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     try {
       localStorage.setItem('mindscroll-theme', newMode);
     } catch {}
-  }, []);
+    const resolved = newMode === 'system' ? getSystemTheme() : newMode;
+    setResolvedTheme(resolved);
+    applyThemeToDOM(resolved);
+  }, [applyThemeToDOM]);
 
-  // Showpiece Circular Reveal using View Transitions API
+  // Smooth circular reveal using View Transitions with fallback
   const toggleTheme = useCallback(
     (event?: React.MouseEvent | MouseEvent) => {
       const nextResolved: ResolvedTheme = resolvedTheme === 'dark' ? 'light' : 'dark';
       const nextMode: ThemeMode = nextResolved;
 
-      // Check if View Transitions API is supported
-      if (!(document as any).startViewTransition || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      // Check if View Transitions API is supported and not reduced motion
+      const startTransition = (document as any).startViewTransition;
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      if (!startTransition || prefersReducedMotion) {
         setMode(nextMode);
         return;
       }
 
-      // Calculate click origin coordinates
+      // Calculate coordinates for circular reveal
       let x = window.innerWidth / 2;
       let y = 0;
-      if (event) {
+      if (event && event.clientX !== undefined) {
         x = event.clientX;
         y = event.clientY;
       }
@@ -97,24 +101,27 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         Math.max(y, window.innerHeight - y)
       );
 
-      const transition = (document as any).startViewTransition(() => {
-        setMode(nextMode);
+      const transition = startTransition.call(document, () => {
         applyThemeToDOM(nextResolved);
+        setModeState(nextMode);
+        setResolvedTheme(nextResolved);
+        try {
+          localStorage.setItem('mindscroll-theme', nextMode);
+        } catch {}
       });
 
       transition.ready.then(() => {
-        const clipPath = [
-          `circle(0px at ${x}px ${y}px)`,
-          `circle(${endRadius}px at ${x}px ${y}px)`,
-        ];
         document.documentElement.animate(
           {
-            clipPath: clipPath,
+            clipPath: [
+              `circle(0px at ${x}px ${y}px)`,
+              `circle(${endRadius}px at ${x}px ${y}px)`
+            ]
           },
           {
-            duration: 450,
+            duration: 350,
             easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
-            pseudoElement: '::view-transition-new(root)',
+            pseudoElement: '::view-transition-new(root)'
           }
         );
       });
@@ -122,7 +129,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     [resolvedTheme, setMode, applyThemeToDOM]
   );
 
-  // Keyboard shortcut "T" listener (when not focused in inputs)
+  // Global keyboard shortcut 'T' listener (ignores input elements)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement;

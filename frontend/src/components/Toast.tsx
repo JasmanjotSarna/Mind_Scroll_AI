@@ -1,6 +1,6 @@
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle2, AlertTriangle, XCircle, Info, X } from 'lucide-react';
+import { CheckCircle2, AlertTriangle, AlertCircle, Info, X } from 'lucide-react';
+import { cn } from '../lib/utils';
 
 export interface ToastMessage {
   id: string;
@@ -16,52 +16,51 @@ interface ToastContainerProps {
 
 export const ToastContainer: React.FC<ToastContainerProps> = ({ toasts, onDismiss }) => {
   return (
-    <div className="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none px-4 sm:px-0">
-      <AnimatePresence>
-        {toasts.map((toast) => {
-          const icons = {
-            success: <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />,
-            warning: <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0" />,
-            error: <XCircle className="w-5 h-5 text-rose-400 shrink-0" />,
-            info: <Info className="w-5 h-5 text-primary shrink-0" />,
-          };
+    <div
+      aria-live="polite"
+      className="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none px-4 sm:px-0"
+    >
+      {toasts.map((toast) => {
+        const iconVariants = {
+          success: <CheckCircle2 className="w-4 h-4 text-status-good shrink-0 mt-0.5" />,
+          warning: <AlertTriangle className="w-4 h-4 text-status-moderate shrink-0 mt-0.5" />,
+          error: <AlertCircle className="w-4 h-4 text-status-concern shrink-0 mt-0.5" />,
+          info: <Info className="w-4 h-4 text-accent shrink-0 mt-0.5" />,
+        };
 
-          const borders = {
-            success: 'border-emerald-500/30',
-            warning: 'border-amber-500/30',
-            error: 'border-rose-500/30',
-            info: 'border-primary/30',
-          };
+        const borderVariants = {
+          success: 'border-status-good/30',
+          warning: 'border-status-moderate/30',
+          error: 'border-status-concern/30',
+          info: 'border-accent/30',
+        };
 
-          return (
-            <motion.div
-              key={toast.id}
-              initial={{ opacity: 0, y: 20, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 10, scale: 0.95 }}
-              transition={{ duration: 0.2 }}
-              className={`pointer-events-auto p-4 rounded-xl glass-panel shadow-2xl border ${borders[toast.type]} flex items-start gap-3`}
+        return (
+          <div
+            key={toast.id}
+            role="status"
+            className={cn(
+              'pointer-events-auto p-4 rounded-xl bg-surface border shadow-lg flex items-start gap-3 transition-all duration-200',
+              borderVariants[toast.type]
+            )}
+          >
+            {iconVariants[toast.type]}
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-fg">{toast.title}</p>
+              {toast.description && (
+                <p className="text-xs text-muted mt-0.5 leading-relaxed">{toast.description}</p>
+              )}
+            </div>
+            <button
+              onClick={() => onDismiss(toast.id)}
+              className="text-muted hover:text-fg transition-colors p-0.5 rounded-md focus:outline-none focus:ring-1 focus:ring-accent"
+              aria-label="Dismiss notification"
             >
-              {icons[toast.type]}
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-white">{toast.title}</p>
-                {toast.description && (
-                  <p className="text-xs text-zinc-400 mt-0.5 leading-relaxed">
-                    {toast.description}
-                  </p>
-                )}
-              </div>
-              <button
-                onClick={() => onDismiss(toast.id)}
-                className="text-zinc-500 hover:text-white transition-colors"
-                aria-label="Dismiss toast"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </motion.div>
-          );
-        })}
-      </AnimatePresence>
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        );
+      })}
     </div>
   );
 };

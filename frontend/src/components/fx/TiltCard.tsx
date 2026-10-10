@@ -1,34 +1,40 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { cn } from '../../lib/utils';
 
 interface TiltCardProps {
   children: React.ReactNode;
   className?: string;
   maxTilt?: number;
-  glare?: boolean;
 }
 
 export const TiltCard: React.FC<TiltCardProps> = ({
   children,
   className = '',
-  maxTilt = 12,
-  glare = true,
+  maxTilt = 8,
 }) => {
   const cardRef = useRef<HTMLDivElement>(null);
+  const [isInteractive, setIsInteractive] = useState(false);
+
+  useEffect(() => {
+    // Only enable tilt on desktop with fine pointer and no reduced motion
+    const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    setIsInteractive(canHover && !reducedMotion);
+  }, []);
 
   const x = useMotionValue(0.5);
   const y = useMotionValue(0.5);
 
-  const springConfig = { stiffness: 350, damping: 25 };
+  const springConfig = { stiffness: 280, damping: 20 };
   const smoothX = useSpring(x, springConfig);
   const smoothY = useSpring(y, springConfig);
 
   const rotateX = useTransform(smoothY, [0, 1], [maxTilt, -maxTilt]);
   const rotateY = useTransform(smoothX, [0, 1], [-maxTilt, maxTilt]);
-  const glareOpacity = useTransform(smoothY, [0, 0.5, 1], [0.3, 0.1, 0]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current || window.matchMedia('(pointer: coarse)').matches) return;
+    if (!isInteractive || !cardRef.current) return;
     const rect = cardRef.current.getBoundingClientRect();
     const mouseX = (e.clientX - rect.left) / rect.width;
     const mouseY = (e.clientY - rect.top) / rect.height;
@@ -37,12 +43,21 @@ export const TiltCard: React.FC<TiltCardProps> = ({
   };
 
   const handleMouseLeave = () => {
+    if (!isInteractive) return;
     x.set(0.5);
     y.set(0.5);
   };
 
+  if (!isInteractive) {
+    return (
+      <div className={cn('bg-surface border border-line rounded-2xl p-6 transition-colors shadow-xs', className)}>
+        {children}
+      </div>
+    );
+  }
+
   return (
-    <div style={{ perspective: 1000 }} className="w-full">
+    <div style={{ perspective: 900 }} className="w-full">
       <motion.div
         ref={cardRef}
         onMouseMove={handleMouseMove}
@@ -52,21 +67,12 @@ export const TiltCard: React.FC<TiltCardProps> = ({
           rotateY,
           transformStyle: 'preserve-3d',
         }}
-        className={`relative overflow-hidden rounded-2xl glass-panel ${className}`}
-      >
-        {/* Dynamic Glare Highlight */}
-        {glare && (
-          <motion.div
-            style={{
-              opacity: glareOpacity,
-              background: `radial-gradient(circle at calc(${x.get()} * 100%) calc(${y.get()} * 100%), rgba(255,255,255,0.25) 0%, transparent 60%)`,
-            }}
-            className="pointer-events-none absolute inset-0 z-20 mix-blend-overlay transition-opacity duration-200"
-          />
+        className={cn(
+          'relative overflow-hidden bg-surface border border-line rounded-2xl p-6 transition-colors shadow-xs',
+          className
         )}
-
-        {/* Card Content with 3D depth */}
-        <div style={{ transform: 'translateZ(18px)' }} className="relative z-10">
+      >
+        <div style={{ transform: 'translateZ(10px)' }} className="relative z-10">
           {children}
         </div>
       </motion.div>

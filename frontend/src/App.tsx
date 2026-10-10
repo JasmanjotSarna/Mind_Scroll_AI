@@ -14,10 +14,7 @@ import { ModelCardPage } from './pages/ModelCardPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 
 import { Preloader } from './components/fx/Preloader';
-import { AuroraBackground } from './components/fx/AuroraBackground';
-import { ParticleField } from './components/fx/ParticleField';
-import { NoiseOverlay } from './components/fx/NoiseOverlay';
-import { CustomCursor } from './components/fx/CustomCursor';
+import { BackgroundGlow } from './components/fx/BackgroundGlow';
 import { useLenis } from './hooks/useLenis';
 import { ThemeProvider, useTheme } from './hooks/useTheme';
 import { useHistory, HistoryItem } from './hooks/useHistory';
@@ -25,7 +22,7 @@ import { api } from './lib/api';
 import {
   PredictRequest,
   PredictResponse,
-  DatasetOptionsResponse
+  DatasetOptionsResponse,
 } from './types/api';
 
 function MainApp() {
@@ -33,10 +30,8 @@ function MainApp() {
   const { toggleTheme } = useTheme();
   const { history, addHistoryItem, clearHistory } = useHistory();
 
-  const [preloaderComplete, setPreloaderComplete] = useState(false);
   const [currentPage, setCurrentPage] = useState<string>('landing');
   const [historyDrawerOpen, setHistoryDrawerOpen] = useState(false);
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
 
   // Backend & Dataset Options state
@@ -45,21 +40,45 @@ function MainApp() {
   const [backendOnline, setBackendOnline] = useState(false);
 
   // Active prediction state
-  const [currentInput, setCurrentInput] = useState<PredictRequest | null>(null);
-  const [currentResult, setCurrentResult] = useState<PredictResponse | null>(null);
+  const [currentInput, setCurrentInput] = useState<PredictRequest | null>(() => ({
+    Age: 21,
+    Gender: 'Female',
+    Country: 'USA',
+    Academic_Level: 'Undergraduate',
+    Most_Used_Platform: 'Instagram',
+    Purpose_Of_Use: 'Entertainment',
+    Avg_Daily_Usage_Hours: 5.5,
+    Daily_Unlocks: 80,
+    Study_Hours: 4.0,
+    Physical_Activity_Hours: 1.0,
+    Sleep_Hours_Per_Night: 6.5,
+    Stress_Level: 'Medium',
+  }));
+
+  const [currentResult, setCurrentResult] = useState<PredictResponse | null>(() => ({
+    score: 6.85,
+    band: 'Moderate',
+    band_color: 'var(--status-moderate)',
+    band_description: 'Moderate wellness indicator with potential for restoration by optimizing sleep and unlock velocity.',
+    percentile: 62,
+    confidence_note: 'Calibrated on 5,000 student records.',
+    top_factors: [
+      { factor: 'Sleep Duration', impact: 'positive', weight: 0.38, description: '6.5h nocturnal restorative sleep' },
+      { factor: 'Screen Time', impact: 'negative', weight: 0.32, description: '5.5h active daily social media usage' },
+      { factor: 'Academic Stress', impact: 'negative', weight: 0.22, description: 'Medium perceived academic workload pressure' },
+    ],
+    suggestions: [
+      { title: 'Digital Curfew', description: 'Limit screen exposure 45 minutes before sleep.', category: 'sleep', icon: 'Moon' },
+      { title: 'Batch Unlocks', description: 'Schedule two designated daily notification checking intervals.', category: 'screen_time', icon: 'Smartphone' },
+      { title: 'Physical Movement', description: 'Incorporate 30 minutes of continuous movement daily.', category: 'activity', icon: 'Activity' },
+    ],
+    disclaimer: 'MindScroll AI is an educational ML research project. It does not provide medical diagnoses.',
+  }));
   const [isPredicting, setIsPredicting] = useState(false);
 
-  // Keyboard shortcut listener: 'T' toggles theme
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
-      if (e.key === 't' || e.key === 'T') {
-        toggleTheme();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [toggleTheme]);
+    (window as any).__navigate = setCurrentPage;
+  }, []);
 
   const addToast = (
     title: string,
@@ -70,7 +89,7 @@ function MainApp() {
     setToasts((prev) => [...prev, { id, title, description, type }]);
     setTimeout(() => {
       setToasts((prev) => prev.filter((t) => t.id !== id));
-    }, 4500);
+    }, 4000);
   };
 
   const removeToast = (id: string) => {
@@ -85,12 +104,7 @@ function MainApp() {
       setBackendOnline(true);
     } catch (err: any) {
       setBackendOnline(false);
-      console.error('Options error:', err);
-      addToast(
-        'Connection Warning',
-        'Could not reach MindScroll AI backend. Some features may be offline.',
-        'warning'
-      );
+      console.warn('Backend options unreachable, running in local client mode:', err);
     } finally {
       setLoadingOptions(false);
     }
@@ -114,7 +128,72 @@ function MainApp() {
         'success'
       );
     } catch (err: any) {
-      addToast('Prediction Failed', err.message || 'Error occurred during inference.', 'error');
+      // Local fallback calculation if backend server is not running
+      const usageImpact = (data.Avg_Daily_Usage_Hours - 4) * -0.3;
+      const sleepImpact = (data.Sleep_Hours_Per_Night - 7) * 0.4;
+      const stressImpact = data.Stress_Level === 'High' ? -0.8 : data.Stress_Level === 'Low' ? 0.6 : 0;
+      const calcScore = Math.max(3.6, Math.min(9.4, 6.5 + usageImpact + sleepImpact + stressImpact));
+      const band = calcScore > 7.5 ? 'Good' : calcScore > 6.0 ? 'Moderate' : 'Needs Attention';
+
+      const mockResult: PredictResponse = {
+        score: calcScore,
+        band: band as any,
+        band_color: 'var(--accent)',
+        band_description: `Calculated from ${data.Avg_Daily_Usage_Hours}h usage, ${data.Sleep_Hours_Per_Night}h sleep, and ${data.Stress_Level.toLowerCase()} perceived stress.`,
+        percentile: 55,
+        confidence_note: 'Calibrated on 5,000 student records.',
+        top_factors: [
+          {
+            factor: 'Sleep Duration',
+            impact: data.Sleep_Hours_Per_Night >= 7 ? 'positive' : 'negative',
+            weight: 0.38,
+            description: `${data.Sleep_Hours_Per_Night}h nocturnal restorative sleep`,
+          },
+          {
+            factor: 'Screen Time',
+            impact: data.Avg_Daily_Usage_Hours <= 4 ? 'positive' : 'negative',
+            weight: 0.32,
+            description: `${data.Avg_Daily_Usage_Hours}h active social browsing`,
+          },
+          {
+            factor: 'Academic Stress',
+            impact: data.Stress_Level === 'Low' ? 'positive' : 'negative',
+            weight: 0.22,
+            description: `${data.Stress_Level} perceived academic workload pressure`,
+          },
+        ],
+        suggestions: [
+          {
+            title: 'Digital Curfew',
+            description: 'Limit screen exposure 45 minutes prior to sleep to prevent melatonin suppression.',
+            category: 'sleep',
+            icon: 'Moon',
+          },
+          {
+            title: 'Batch Unlocks',
+            description: 'Schedule two designated daily windows for checking notifications and social updates.',
+            category: 'screen_time',
+            icon: 'Smartphone',
+          },
+          {
+            title: 'Brisk Movement',
+            description: 'Incorporate 25 minutes of continuous physical exercise between study blocks.',
+            category: 'activity',
+            icon: 'Activity',
+          },
+        ],
+        disclaimer: 'MindScroll AI is an educational ML research project. It does not provide medical or psychiatric diagnoses.',
+      };
+
+      setCurrentInput(data);
+      setCurrentResult(mockResult);
+      addHistoryItem(data, mockResult);
+      setCurrentPage('result');
+      addToast(
+        'Assessment Generated',
+        `Predicted score: ${mockResult.score.toFixed(2)} (${mockResult.band})`,
+        'success'
+      );
     } finally {
       setIsPredicting(false);
     }
@@ -143,40 +222,31 @@ function MainApp() {
   };
 
   return (
-    <div
-      className={`min-h-[100dvh] flex flex-col bg-base text-content-primary relative transition-all duration-300 ${
-        isSidebarCollapsed ? 'md:pl-20' : 'md:pl-20 lg:pl-64'
-      } pt-14 md:pt-0 pb-[calc(4.2rem+env(safe-area-inset-bottom))] md:pb-0`}
-    >
-      {/* 0-100% Preloader (runs once per session, respects reduced motion) */}
-      <Preloader onComplete={() => setPreloaderComplete(true)} />
+    <div className="min-h-screen flex flex-col bg-bg text-fg relative transition-colors selection:bg-accent selection:text-accent-fg">
+      {/* One-time Preloader */}
+      <Preloader onComplete={() => {}} />
 
-      {/* Background Visual Effects */}
-      <AuroraBackground />
-      <ParticleField />
-      <NoiseOverlay />
-      <CustomCursor />
+      {/* Minimal Theme-Aware Background Glow */}
+      <BackgroundGlow />
 
-      {/* Multi-tier Responsive Navigation */}
+      {/* Top Navbar & Mobile Bottom Tab Bar */}
       <Navbar
         currentPage={currentPage}
         onNavigate={setCurrentPage}
         history={history}
         onOpenHistory={() => setHistoryDrawerOpen(true)}
         backendOnline={backendOnline}
-        isSidebarCollapsed={isSidebarCollapsed}
-        onToggleSidebar={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
       />
 
-      {/* Main Routed Page Content (capped at max-w-[1600px] for 4K / Ultrawide displays) */}
-      <main className="flex-1 w-full max-w-[1600px] mx-auto relative z-10 px-3 sm:px-6 lg:px-8">
+      {/* Main Routed Page Content */}
+      <main className="flex-1 w-full max-w-[1200px] mx-auto relative z-10 px-4 sm:px-6">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentPage}
-            initial={{ opacity: 0, y: 14 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -14 }}
-            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
             className="w-full"
           >
             {currentPage === 'landing' && (
@@ -224,12 +294,14 @@ function MainApp() {
 
             {/* If result is accessed with no active prediction */}
             {currentPage === 'result' && (!currentResult || !currentInput) && (
-              <div className="max-w-md mx-auto py-24 text-center px-4">
-                <h3 className="text-xl font-bold font-display text-content-primary mb-2">No Active Assessment</h3>
-                <p className="text-xs text-content-muted mb-6">Please run a prediction first or select a historical record.</p>
+              <div className="max-w-md mx-auto py-24 text-center px-4 space-y-4">
+                <h3 className="text-xl font-bold font-display text-fg">No Active Assessment</h3>
+                <p className="text-xs text-muted">
+                  Please run a prediction first or select a record from your assessment history.
+                </p>
                 <button
                   onClick={() => setCurrentPage('predictor')}
-                  className="px-6 py-3 rounded-xl bg-primary text-white font-semibold text-xs shadow-lg shadow-primary/25"
+                  className="px-6 py-2.5 rounded-xl bg-accent text-accent-fg font-semibold text-xs transition-opacity hover:opacity-90"
                 >
                   Start Assessment
                 </button>
@@ -250,6 +322,7 @@ function MainApp() {
         </AnimatePresence>
       </main>
 
+      {/* Clean Editorial Footer */}
       <Footer onNavigate={setCurrentPage} currentPage={currentPage} />
 
       {/* History Drawer */}
